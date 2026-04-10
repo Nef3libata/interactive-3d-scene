@@ -1,0 +1,60 @@
+@use "../../assets/scss/variables" as v;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 v.$spacing-lg;
+  background-color: v.$bg-secondary;
+  border-bottom: 1px solid v.$border;
+}
+
+.header__left,
+.header__right {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-md;
+}
+
+.header__logo {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-sm;
+}
+
+.header__logo-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(29, 78, 216));
+  border-radius: v.$border-radius-sm;
+}
+
+.header__title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.header__action {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-xs;
+  padding: 6px 12px;
+  background: none;
+  color: v.$text-secondary;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.header__action:hover {
+  background-color: #ffffff0d;
+}
+
+.header__action--danger:hover {
+  background-color: #fb2c361a;
+}
