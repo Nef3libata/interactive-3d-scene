@@ -1,0 +1,121 @@
+@use "../../assets/scss/variables" as v;
+
+.left-panels {
+  position: absolute;
+  left: v.$spacing-md;
+  top: v.$spacing-md;
+  bottom: v.$spacing-md;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.left-panels__panel {
+  background-color: v.$bg-secondary;
+  border: 1px solid v.$border;
+  border-radius: 14px;
+  padding: v.$spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-md;
+  pointer-events: auto;
+  min-width: 150px;
+}
+
+.left-panels__title {
+  font-size: 10px;
+  font-weight: 500;
+  color: v.$text-muted;
+  letter-spacing: 0.5px;
+}
+
+.left-panels__panel:last-child .left-panels__title {
+  color: #4b5563;
+}
+
+.left-panels__camera {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-xs;
+}
+
+.left-panels__camera-row {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-sm;
+}
+
+.left-panels__camera-label {
+  font-size: 11px;
+  font-weight: 600;
+  width: 14px;
+}
+
+.left-panels__camera-label--x {
+  color: #f87171;
+}
+
+.left-panels__camera-label--y {
+  color: #4ade80;
+}
+
+.left-panels__camera-label--z {
+  color: #60a5fa;
+}
+
+.left-panels__camera-value {
+  font-size: 13px;
+  color: #94a3b8;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.left-panels__views {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-xs;
+}
+
+.left-panels__view-btn {
+  padding: v.$spacing-xs v.$spacing-sm;
+  background-color: #ffffff08;
+  color: #9ca3af;
+  border: 1px solid #ffffff0f;
+  border-radius: v.$border-radius;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.left-panels__view-btn:hover {
+  color: #93c5fdd9;
+  background-color: #3b82f626;
+}
+
+.left-panels__controls {
+  display: flex;
+  flex-direction: column;
+  gap: v.$spacing-sm;
+}
+
+.left-panels__control-row {
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-sm;
+}
+
+.left-panels__control-label {
+  font-size: 11px;
+  color: #9ca3af;
+  flex: 1;
+}
+
+.left-panels__control-badge {
+  font-size: 10px;
+  color: #6b7280;
+  background-color: #ffffff0a;
+  border: 1px solid #ffffff12;
+  padding: 2px 8px;
+  border-radius: v.$border-radius-sm;
+}
