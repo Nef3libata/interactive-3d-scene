@@ -1,0 +1,23 @@
+.axes-indicator {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+  background: #0d1117cc;
+  border: 1px solid #ffffff0f;
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+
+  &__label {
+    color: #2d3a4a;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
