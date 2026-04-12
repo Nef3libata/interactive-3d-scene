@@ -8,6 +8,25 @@
   flex-direction: column;
   flex-shrink: 0;
   overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff0f transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ffffff0f;
+    border-radius: 2px;
+
+    &:hover {
+      background: #ffffff1f;
+    }
+  }
 }
 
 .right-sidebar__header {
@@ -239,7 +258,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 32px 20px;
+  padding: 22px 20px;
 }
 
 .right-sidebar__empty-icon {
