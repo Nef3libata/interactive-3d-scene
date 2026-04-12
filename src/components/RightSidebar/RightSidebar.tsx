@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Vector3 } from "three";
 import { useStore } from "@core/store/useStore";
 import eyeIcon from "@components/icons/eye-icon.svg";
@@ -34,6 +34,7 @@ export const RightSidebar = () => {
   const [selectedColor, setSelectedColor] = useState("#3b82f6");
   const [ballSize, setBallSize] = useState(4);
   const [selectedBallId, setSelectedBallId] = useState<string | null>(null);
+  const colorInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddBall = () => {
     const radius = ballSize / 10;
@@ -86,7 +87,10 @@ export const RightSidebar = () => {
             ))}
           </div>
 
-          <div className="right-sidebar__color-display">
+          <div
+            className="right-sidebar__color-display"
+            onClick={() => colorInputRef.current?.click()}
+          >
             <div
               className="right-sidebar__color-preview"
               style={{ backgroundColor: selectedColor }}
@@ -94,6 +98,13 @@ export const RightSidebar = () => {
             <span className="right-sidebar__color-hex">
               {selectedColor.toUpperCase()}
             </span>
+            <input
+              ref={colorInputRef}
+              type="color"
+              value={selectedColor}
+              onChange={(e) => setSelectedColor(e.target.value)}
+              className="right-sidebar__color-input"
+            />
           </div>
         </section>
 

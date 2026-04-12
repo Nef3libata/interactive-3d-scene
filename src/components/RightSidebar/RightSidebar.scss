@@ -89,9 +89,25 @@
 }
 
 .right-sidebar__color-display {
+  position: relative;
   display: flex;
   gap: 6px;
   border-radius: v.$border-radius-sm;
+  cursor: pointer;
+  transition: opacity 0.12s;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.right-sidebar__color-input {
+  position: absolute;
+  right: 204px;
+  top: 95%;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 .right-sidebar__color-preview {
