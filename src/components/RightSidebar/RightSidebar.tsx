@@ -141,7 +141,7 @@ export const RightSidebar = () => {
       <div className="right-sidebar__scene-objects">
         <div className="right-sidebar__scene-objects-header">
           <div className="right-sidebar__objects-header">
-            <img src={objectsIcon} />
+            <img src={objectsIcon} alt="objects" />
             <h5 className="right-sidebar__label">Scene Objects</h5>
           </div>
           {spheres.length > 0 && (
@@ -197,7 +197,7 @@ export const RightSidebar = () => {
                   }}
                   aria-label="Toggle visibility"
                 >
-                  <img src={eyeIcon} alt="focus on object" />
+                  <img src={eyeIcon} alt="toggle visibility" />
                 </button>
                 <button
                   className="right-sidebar__object-btn right-sidebar__object-btn--delete"
