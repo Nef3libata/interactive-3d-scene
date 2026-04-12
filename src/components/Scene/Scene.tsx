@@ -6,6 +6,10 @@ import * as THREE from "three";
 import { type OrbitControls as OrbitControlsType } from "three-stdlib";
 import { useStore } from "@core/store/useStore";
 import { type Sphere } from "@core/models/types";
+import {
+  AxesIndicator,
+  cameraQuaternionRef,
+} from "@components/AxesIndicator/AxesIndicator";
 import "./Scene.scss";
 
 const STL_PATH = "/3D_Model.stl";
@@ -98,6 +102,8 @@ const CameraController = ({
   const setCameraTarget = useStore((state) => state.setCameraTarget);
 
   useFrame(({ camera }, delta) => {
+    cameraQuaternionRef.current.copy(camera.quaternion);
+
     if (cameraTarget) {
       camera.position.lerp(cameraTarget, LERP_SPEED * delta);
 
@@ -182,6 +188,7 @@ export const Scene = () => {
           maxDistance={40}
         />
       </Canvas>
+      <AxesIndicator />
     </div>
   );
 };
