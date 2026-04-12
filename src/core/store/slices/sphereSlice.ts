@@ -3,16 +3,14 @@ import { type Sphere } from "../../models/types";
 
 export interface SphereSlice {
   spheres: Sphere[];
-  selectedSphereId: string | null;
   addSphere: (sphere: Sphere) => void;
   removeSphere: (id: string) => void;
+  toggleSphereVisibility: (id: string) => void;
   clearAllSpheres: () => void;
-  setSelectedSphereId: (id: string | null) => void;
 }
 
 export const createSphereSlice: StateCreator<SphereSlice> = (set) => ({
   spheres: [],
-  selectedSphereId: null,
   addSphere: (sphere) =>
     set((state) => ({
       spheres: [...state.spheres, sphere],
@@ -21,6 +19,11 @@ export const createSphereSlice: StateCreator<SphereSlice> = (set) => ({
     set((state) => ({
       spheres: state.spheres.filter((s) => s.id !== id),
     })),
-  clearAllSpheres: () => set({ spheres: [], selectedSphereId: null }),
-  setSelectedSphereId: (id) => set({ selectedSphereId: id }),
+  toggleSphereVisibility: (id) =>
+    set((state) => ({
+      spheres: state.spheres.map((s) =>
+        s.id === id ? { ...s, visible: !s.visible } : s
+      ),
+    })),
+  clearAllSpheres: () => set({ spheres: [] }),
 });
