@@ -1,120 +1,116 @@
 import { useState } from "react";
+import { Vector3 } from "three";
 import { useStore } from "@core/store/useStore";
-import controlIcon from "@components/icons/control-icon.svg";
-import chevronIcon from "@components/icons/chevron-right-icon.svg";
 import eyeIcon from "@components/icons/eye-icon.svg";
 import trashIcon from "@components/icons/trash-gray-icon.svg";
+import objectsIcon from "@components/icons/objects-icon.svg";
 import "./RightSidebar.scss";
 
-const hexToRgb = (hex: string) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `${r}, ${g}, ${b}`;
-};
-
-const getBallStyle = (hex: string): React.CSSProperties => {
-  const rgb = hexToRgb(hex);
-  return {
-    background: `radial-gradient(circle at 35% 35%, rgba(${rgb}, 0.8), rgba(${rgb}, 0.27))`,
-    border: `1.5px solid rgba(${rgb}, 0.4)`,
-    boxShadow: `rgba(${rgb}, 0.27) 0px 0px 8px`,
-  };
-};
-
 const PRESET_COLORS = [
-  "#5b8def",
-  "#22c55e",
-  "#ef4444",
-  "#f59e0b",
-  "#a855f7",
+  "#3b82f6",
+  "#2563eb",
+  "#6366f1",
+  "#8b5cf6",
   "#ec4899",
-  "#14b8a6",
+  "#ef4444",
   "#f97316",
-  "#f5f5f5",
-  "#737373",
+  "#f59e0b",
+  "#22c55e",
+  "#14b8a6",
+  "#a1a1aa",
+  "#6b7280",
 ];
 
 export const RightSidebar = () => {
   const spheres = useStore((state) => state.spheres);
   const addSphere = useStore((state) => state.addSphere);
   const removeSphere = useStore((state) => state.removeSphere);
+  const toggleSphereVisibility = useStore(
+    (state) => state.toggleSphereVisibility
+  );
   const clearAllSpheres = useStore((state) => state.clearAllSpheres);
+  const setCameraTarget = useStore((state) => state.setCameraTarget);
 
-  const [collapsed, setCollapsed] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("#5b8def");
-  const [ballSize, setBallSize] = useState(5);
+  const [selectedColor, setSelectedColor] = useState("#3b82f6");
+  const [ballSize, setBallSize] = useState(4);
+  const [selectedBallId, setSelectedBallId] = useState<string | null>(null);
 
   const handleAddBall = () => {
+    const radius = ballSize / 10;
+    const offset = spheres.length * 1.5;
+    const angle = spheres.length * 1.2;
     const newSphere = {
       id: Date.now().toString(),
-      position: [0, ballSize / 2, 0] as [number, number, number],
+      position: [
+        Math.cos(angle) * (2 + offset * 0.3),
+        radius,
+        Math.sin(angle) * (2 + offset * 0.3),
+      ] as [number, number, number],
       color: selectedColor,
-      radius: ballSize / 10,
+      radius,
       visible: true,
     };
     addSphere(newSphere);
   };
 
+  const handleFocusBall = (position: [number, number, number]) => {
+    setCameraTarget(
+      new Vector3(position[0] + 3, position[1] + 2, position[2] + 3)
+    );
+  };
+
   return (
-    <aside
-      className={`right-sidebar ${collapsed ? "right-sidebar--collapsed" : ""}`}
-    >
+    <aside className="right-sidebar">
       <div className="right-sidebar__header">
-        <img src={controlIcon} alt="" width="20" height="20" />
-        <h4 className="right-sidebar__title">Scene Controls</h4>
-        <button
-          className="right-sidebar__collapse-btn"
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label={collapsed ? "Expand panel" : "Collapse panel"}
-        >
-          <img src={chevronIcon} alt="" width="16" height="16" />
-        </button>
+        <h4 className="right-sidebar__title">Properties</h4>
+        <span className="right-sidebar__count">
+          {spheres.length} {spheres.length === 1 ? "object" : "objects"}
+        </span>
       </div>
 
       <div className="right-sidebar__body">
-        <div className="right-sidebar__card">
-          <section className="right-sidebar__section">
-            <div className="right-sidebar__section-header">
-              <h5 className="right-sidebar__label">BALL COLOR</h5>
-              <div className="right-sidebar__color-display">
-                <div
-                  className="right-sidebar__color-dot"
-                  style={{ backgroundColor: selectedColor }}
-                />
-                <span className="right-sidebar__color-hex">
-                  {selectedColor}
-                </span>
-              </div>
-            </div>
+        <section className="right-sidebar__section">
+          <h5 className="right-sidebar__label">Color</h5>
 
-            <div className="right-sidebar__color-grid">
-              {PRESET_COLORS.map((color) => (
-                <button
-                  key={color}
-                  className={`right-sidebar__swatch ${
-                    selectedColor === color
-                      ? "right-sidebar__swatch--active"
-                      : ""
-                  }`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
-                  aria-label={`Select color ${color}`}
-                />
-              ))}
-            </div>
+          <div className="right-sidebar__color-grid">
+            {PRESET_COLORS.map((color) => (
+              <button
+                key={color}
+                className={`right-sidebar__swatch ${
+                  selectedColor === color ? "right-sidebar__swatch--active" : ""
+                }`}
+                style={{ backgroundColor: color }}
+                onClick={() => setSelectedColor(color)}
+                aria-label={`Select color ${color}`}
+              />
+            ))}
+          </div>
 
-            <button className="right-sidebar__custom-color">
-              Custom color
-            </button>
-          </section>
+          <div className="right-sidebar__color-display">
+            <div
+              className="right-sidebar__color-preview"
+              style={{ backgroundColor: selectedColor }}
+            />
+            <span className="right-sidebar__color-hex">
+              {selectedColor.toUpperCase()}
+            </span>
+          </div>
+        </section>
 
-          <section className="right-sidebar__section">
-            <div className="right-sidebar__section-header">
-              <h5 className="right-sidebar__label">BALL SIZE</h5>
-              <span className="right-sidebar__size-value">{ballSize}</span>
-            </div>
+        <section className="right-sidebar__section">
+          <h5 className="right-sidebar__label">Size</h5>
 
+          <div className="right-sidebar__size-row">
+            <div
+              className="right-sidebar__size-preview"
+              style={{
+                width: 8 + ballSize * 2,
+                height: 8 + ballSize * 2,
+                background:
+                  "radial-gradient(circle at 38% 35%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05))",
+                border: "1px solid #ffffff40",
+              }}
+            />
             <input
               type="range"
               min="1"
@@ -123,27 +119,31 @@ export const RightSidebar = () => {
               onChange={(e) => setBallSize(Number(e.target.value))}
               className="right-sidebar__slider"
               style={{
-                background: `linear-gradient(to right, #4b8cff ${
+                background: `linear-gradient(to right, #3b82f6 ${
                   ((ballSize - 1) / 9) * 100
                 }%, #262626 0%)`,
               }}
             />
+            <span className="right-sidebar__size-value">{ballSize}</span>
+          </div>
 
-            <div className="right-sidebar__slider-labels">
-              <span>Small</span>
-              <span>Large</span>
-            </div>
-          </section>
-        </div>
+          <div className="right-sidebar__slider-labels">
+            <span>1</span>
+            <span>10</span>
+          </div>
+        </section>
 
         <button className="right-sidebar__add-btn" onClick={handleAddBall}>
-          + Add Ball to Scene
+          + Add to Scene
         </button>
       </div>
 
       <div className="right-sidebar__scene-objects">
         <div className="right-sidebar__scene-objects-header">
-          <h5 className="right-sidebar__label">SCENE OBJECTS</h5>
+          <div className="right-sidebar__objects-header">
+            <img src={objectsIcon} />
+            <h5 className="right-sidebar__label">Scene Objects</h5>
+          </div>
           {spheres.length > 0 && (
             <button
               className="right-sidebar__clear-btn"
@@ -156,37 +156,58 @@ export const RightSidebar = () => {
 
         <div className="right-sidebar__objects">
           {spheres.length === 0 ? (
-            <p className="right-sidebar__empty">No objects in scene</p>
+            <div className="right-sidebar__empty">
+              <div className="right-sidebar__empty-icon" />
+              <p className="right-sidebar__empty-title">No objects in scene.</p>
+              <p className="right-sidebar__empty-subtitle">
+                Add a ball to get started.
+              </p>
+            </div>
           ) : (
             spheres.map((sphere, index) => (
-              <div key={sphere.id} className="right-sidebar__object">
-                <span className="right-sidebar__object-index">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+              <div
+                key={sphere.id}
+                className={`right-sidebar__object ${
+                  selectedBallId === sphere.id
+                    ? "right-sidebar__object--selected"
+                    : ""
+                }`}
+                onClick={() => {
+                  setSelectedBallId(sphere.id);
+                  handleFocusBall(sphere.position);
+                }}
+              >
                 <div
                   className="right-sidebar__object-color"
-                  style={getBallStyle(sphere.color)}
+                  style={{ backgroundColor: sphere.color }}
                 />
                 <div className="right-sidebar__object-info">
                   <span className="right-sidebar__object-name">
-                    Ball #{index + 1}
+                    Ball {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="right-sidebar__object-size">
-                    Size {sphere.radius * 10} M
+                    size {sphere.radius * 10}
                   </span>
                 </div>
                 <button
                   className="right-sidebar__object-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleSphereVisibility(sphere.id);
+                  }}
                   aria-label="Toggle visibility"
                 >
-                  <img src={eyeIcon} alt="" width="16" height="16" />
+                  <img src={eyeIcon} alt="focus on object" />
                 </button>
                 <button
                   className="right-sidebar__object-btn right-sidebar__object-btn--delete"
-                  onClick={() => removeSphere(sphere.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeSphere(sphere.id);
+                  }}
                   aria-label="Delete ball"
                 >
-                  <img src={trashIcon} alt="" width="16" height="16" />
+                  <img src={trashIcon} alt="delete object" />
                 </button>
               </div>
             ))
