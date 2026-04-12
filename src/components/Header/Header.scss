@@ -36,3 +36,26 @@
   font-size: 15px;
   font-weight: 700;
 }
+
+.header__right {
+  display: flex;
+  align-items: center;
+}
+
+.header__help-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+
+  &:hover {
+    background: #ffffff0f;
+    color: #cbd5e1;
+  }
+}
