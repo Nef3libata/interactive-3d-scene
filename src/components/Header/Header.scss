@@ -10,8 +10,7 @@
   border-bottom: 1px solid v.$border;
 }
 
-.header__left,
-.header__right {
+.header__left {
   display: flex;
   align-items: center;
   gap: v.$spacing-md;
@@ -36,25 +35,4 @@
 .header__title {
   font-size: 15px;
   font-weight: 700;
-}
-
-.header__action {
-  display: flex;
-  align-items: center;
-  gap: v.$spacing-xs;
-  padding: 6px 12px;
-  background: none;
-  color: v.$text-secondary;
-  font-size: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  font-weight: 500;
-}
-
-.header__action:hover {
-  background-color: #ffffff0d;
-}
-
-.header__action--danger:hover {
-  background-color: #fb2c361a;
 }
