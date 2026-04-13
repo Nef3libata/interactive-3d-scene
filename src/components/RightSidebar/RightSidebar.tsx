@@ -23,7 +23,6 @@ const PRESET_COLORS = [
 
 export const RightSidebar = () => {
   const spheres = useStore((state) => state.spheres);
-  const addSphere = useStore((state) => state.addSphere);
   const removeSphere = useStore((state) => state.removeSphere);
   const clearAllSpheres = useStore((state) => state.clearAllSpheres);
   const setCameraTarget = useStore((state) => state.setCameraTarget);
