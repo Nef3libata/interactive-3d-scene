@@ -137,6 +137,27 @@ const CameraController = ({
 
 const GROUND_PLANE = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
+const raycastToSurface = (
+  raycaster: THREE.Raycaster,
+  mouse: THREE.Vector2,
+  camera: THREE.Camera,
+  scene: THREE.Scene
+): THREE.Vector3 | null => {
+  raycaster.setFromCamera(mouse, camera);
+
+  const meshes = scene.children.filter(
+    (c) => c instanceof THREE.Mesh || c instanceof THREE.Group
+  );
+  const hits = raycaster.intersectObjects(meshes, true);
+
+  if (hits.length > 0) return hits[0].point;
+
+  const groundHit = new THREE.Vector3();
+  return raycaster.ray.intersectPlane(GROUND_PLANE, groundHit)
+    ? groundHit
+    : null;
+};
+
 const PlacementHandler = () => {
   const { camera, gl, scene } = useThree();
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
@@ -153,24 +174,7 @@ const PlacementHandler = () => {
         -((e.clientY - rect.top) / rect.height) * 2 + 1
       );
 
-      raycaster.setFromCamera(mouse, camera);
-
-      const meshes = scene.children.filter(
-        (c) => c instanceof THREE.Mesh || c instanceof THREE.Group
-      );
-      const hits = raycaster.intersectObjects(meshes, true);
-
-      let point: THREE.Vector3 | null = null;
-
-      if (hits.length > 0) {
-        point = hits[0].point;
-      } else {
-        const groundHit = new THREE.Vector3();
-        if (raycaster.ray.intersectPlane(GROUND_PLANE, groundHit)) {
-          point = groundHit;
-        }
-      }
-
+      const point = raycastToSurface(raycaster, mouse, camera, scene);
       if (!point) return;
 
       const position: [number, number, number] = [
@@ -196,6 +200,44 @@ const PlacementHandler = () => {
   }, [gl, handleClick]);
 
   return null;
+};
+
+const PlacementPreview = () => {
+  const mode = useStore((state) => state.mode);
+  const color = useStore((state) => state.placementColor);
+  const radius = useStore((state) => state.placementRadius);
+  const meshRef = useRef<THREE.Mesh>(null);
+  const { camera, scene, pointer } = useThree();
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+
+  useFrame(() => {
+    if (!meshRef.current) return;
+    const point = raycastToSurface(raycaster, pointer, camera, scene);
+    if (point) {
+      meshRef.current.position.set(
+        point.x,
+        Math.max(radius, point.y + radius),
+        point.z
+      );
+      meshRef.current.visible = true;
+    } else {
+      meshRef.current.visible = false;
+    }
+  });
+
+  if (mode !== "placing") return null;
+
+  return (
+    <mesh ref={meshRef} visible={false} raycast={() => {}}>
+      <sphereGeometry args={[radius, 32, 32]} />
+      <meshStandardMaterial
+        color={color}
+        transparent
+        opacity={0.4}
+        depthWrite={false}
+      />
+    </mesh>
+  );
 };
 
 export const Scene = () => {
@@ -256,6 +298,7 @@ export const Scene = () => {
         <FloorGrid />
         <ShadowPlane />
 
+        <PlacementPreview />
         <PlacementHandler />
         <CameraController controlsRef={controlsRef} />
         <OrbitControls
