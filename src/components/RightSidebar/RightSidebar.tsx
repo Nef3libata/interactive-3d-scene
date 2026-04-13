@@ -31,10 +31,11 @@ export const RightSidebar = () => {
   const mode = useStore((state) => state.mode);
   const setMode = useStore((state) => state.setMode);
   const startPlacing = useStore((state) => state.startPlacing);
+  const selectedBallId = useStore((state) => state.selectedBallId);
+  const selectBall = useStore((state) => state.selectBall);
 
   const [selectedColor, setSelectedColor] = useState("#3b82f6");
   const [ballSize, setBallSize] = useState(4);
-  const [selectedBallId, setSelectedBallId] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
 
@@ -229,7 +230,7 @@ export const RightSidebar = () => {
                         : ""
                     }`}
                     onClick={() => {
-                      setSelectedBallId(sphere.id);
+                      selectBall(sphere.id);
                       handleFocusBall(sphere.position, sphere.radius);
                     }}
                   >
@@ -249,6 +250,7 @@ export const RightSidebar = () => {
                       className="right-sidebar__object-btn"
                       onClick={(e) => {
                         e.stopPropagation();
+                        selectBall(sphere.id);
                         handleFocusBall(sphere.position, sphere.radius);
                       }}
                       aria-label="Focus on ball"
