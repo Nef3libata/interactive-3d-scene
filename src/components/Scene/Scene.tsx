@@ -1,5 +1,5 @@
-import { useRef, useMemo } from "react";
-import { Canvas, useLoader, useFrame } from "@react-three/fiber";
+import { useRef, useMemo, useEffect, useCallback } from "react";
+import { Canvas, useLoader, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
@@ -135,6 +135,69 @@ const CameraController = ({
   return null;
 };
 
+const GROUND_PLANE = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+const PlacementHandler = () => {
+  const { camera, gl, scene } = useThree();
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+
+  const handleClick = useCallback(
+    (e: MouseEvent) => {
+      const { mode, placementColor, placementRadius, addSphere, setMode } =
+        useStore.getState();
+      if (mode !== "placing") return;
+
+      const rect = gl.domElement.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      raycaster.setFromCamera(mouse, camera);
+
+      const meshes = scene.children.filter(
+        (c) => c instanceof THREE.Mesh || c instanceof THREE.Group
+      );
+      const hits = raycaster.intersectObjects(meshes, true);
+
+      let point: THREE.Vector3 | null = null;
+
+      if (hits.length > 0) {
+        point = hits[0].point;
+      } else {
+        const groundHit = new THREE.Vector3();
+        if (raycaster.ray.intersectPlane(GROUND_PLANE, groundHit)) {
+          point = groundHit;
+        }
+      }
+
+      if (!point) return;
+
+      const position: [number, number, number] = [
+        point.x,
+        Math.max(placementRadius, point.y + placementRadius),
+        point.z,
+      ];
+
+      addSphere({
+        id: Date.now().toString(),
+        position,
+        color: placementColor,
+        radius: placementRadius,
+      });
+      setMode("idle");
+    },
+    [camera, gl, scene, raycaster]
+  );
+
+  useEffect(() => {
+    gl.domElement.addEventListener("click", handleClick);
+    return () => gl.domElement.removeEventListener("click", handleClick);
+  }, [gl, handleClick]);
+
+  return null;
+};
+
 export const Scene = () => {
   const controlsRef = useRef<OrbitControlsType | null>(null);
 
@@ -193,6 +256,7 @@ export const Scene = () => {
         <FloorGrid />
         <ShadowPlane />
 
+        <PlacementHandler />
         <CameraController controlsRef={controlsRef} />
         <OrbitControls
           ref={controlsRef}

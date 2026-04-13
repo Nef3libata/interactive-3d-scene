@@ -30,6 +30,7 @@ export const RightSidebar = () => {
   const setOrbitTarget = useStore((state) => state.setOrbitTarget);
   const mode = useStore((state) => state.mode);
   const setMode = useStore((state) => state.setMode);
+  const startPlacing = useStore((state) => state.startPlacing);
 
   const [selectedColor, setSelectedColor] = useState("#3b82f6");
   const [ballSize, setBallSize] = useState(4);
@@ -38,7 +39,11 @@ export const RightSidebar = () => {
   const colorInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddBall = () => {
-    setMode(mode === "placing" ? "idle" : "placing");
+    if (mode === "placing") {
+      setMode("idle");
+    } else {
+      startPlacing(selectedColor, ballSize / 10);
+    }
   };
 
   useEffect(() => {
