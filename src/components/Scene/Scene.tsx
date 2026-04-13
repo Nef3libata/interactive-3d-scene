@@ -301,7 +301,7 @@ export const Scene = () => {
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.1,
         }}
-        shadows={{ type: THREE.PCFSoftShadowMap }}
+        shadows={{ type: THREE.PCFShadowMap }}
         onPointerMissed={() => {
           const { mode, selectBall } = useStore.getState();
           if (mode === "idle") selectBall(null);
