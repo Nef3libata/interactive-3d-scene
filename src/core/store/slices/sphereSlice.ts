@@ -5,7 +5,6 @@ export interface SphereSlice {
   spheres: Sphere[];
   addSphere: (sphere: Sphere) => void;
   removeSphere: (id: string) => void;
-  toggleSphereVisibility: (id: string) => void;
   clearAllSpheres: () => void;
 }
 
@@ -18,12 +17,6 @@ export const createSphereSlice: StateCreator<SphereSlice> = (set) => ({
   removeSphere: (id) =>
     set((state) => ({
       spheres: state.spheres.filter((s) => s.id !== id),
-    })),
-  toggleSphereVisibility: (id) =>
-    set((state) => ({
-      spheres: state.spheres.map((s) =>
-        s.id === id ? { ...s, visible: !s.visible } : s
-      ),
     })),
   clearAllSpheres: () => set({ spheres: [] }),
 });
