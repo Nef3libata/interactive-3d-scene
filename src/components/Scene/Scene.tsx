@@ -48,17 +48,42 @@ const StlModel = () => {
   );
 };
 
-const SceneSphere = ({ position, radius, color }: Sphere) => (
-  <mesh position={position} castShadow receiveShadow>
-    <sphereGeometry args={[radius, 40, 40]} />
-    <meshStandardMaterial
-      color={color}
-      metalness={0.15}
-      roughness={0.28}
-      envMapIntensity={1.2}
-    />
-  </mesh>
-);
+const SceneSphere = ({ id, position, radius, color }: Sphere) => {
+  const handleClick = useCallback(
+    (e: { stopPropagation: () => void }) => {
+      const { mode, selectBall, setCameraTarget, setOrbitTarget } =
+        useStore.getState();
+      if (mode !== "idle") return;
+      e.stopPropagation();
+
+      selectBall(id);
+
+      const ballPos = new THREE.Vector3(...position);
+      const dir = new THREE.Vector3(ballPos.x, 0, ballPos.z);
+      if (dir.lengthSq() < 0.001) dir.set(1, 0, 1);
+      dir.normalize();
+      const viewDistance = Math.max(2, radius * 5 + 1.5);
+      const cameraPos = ballPos.clone().addScaledVector(dir, viewDistance);
+      cameraPos.y += radius * 2 + 0.8;
+
+      setCameraTarget(cameraPos);
+      setOrbitTarget(ballPos);
+    },
+    [id, position, radius]
+  );
+
+  return (
+    <mesh position={position} castShadow receiveShadow onClick={handleClick}>
+      <sphereGeometry args={[radius, 40, 40]} />
+      <meshStandardMaterial
+        color={color}
+        metalness={0.15}
+        roughness={0.28}
+        envMapIntensity={1.2}
+      />
+    </mesh>
+  );
+};
 
 const Spheres = () => {
   const spheres = useStore((state) => state.spheres);
@@ -146,7 +171,9 @@ const raycastToSurface = (
   raycaster.setFromCamera(mouse, camera);
 
   const meshes = scene.children.filter(
-    (c) => c instanceof THREE.Mesh || c instanceof THREE.Group
+    (c) =>
+      (c instanceof THREE.Mesh || c instanceof THREE.Group) &&
+      !c.userData.isPreview
   );
   const hits = raycaster.intersectObjects(meshes, true);
 
@@ -158,12 +185,26 @@ const raycastToSurface = (
     : null;
 };
 
+const DRAG_THRESHOLD = 5;
+
 const PlacementHandler = () => {
   const { camera, gl, scene } = useThree();
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  const downPos = useRef<{ x: number; y: number } | null>(null);
 
-  const handleClick = useCallback(
-    (e: MouseEvent) => {
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      downPos.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const onUp = (e: PointerEvent) => {
+      if (!downPos.current) return;
+      const dx = e.clientX - downPos.current.x;
+      const dy = e.clientY - downPos.current.y;
+      downPos.current = null;
+
+      if (Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD) return;
+
       const { mode, placementColor, placementRadius, addSphere, setMode } =
         useStore.getState();
       if (mode !== "placing") return;
@@ -190,14 +231,16 @@ const PlacementHandler = () => {
         radius: placementRadius,
       });
       setMode("idle");
-    },
-    [camera, gl, scene, raycaster]
-  );
+    };
 
-  useEffect(() => {
-    gl.domElement.addEventListener("click", handleClick);
-    return () => gl.domElement.removeEventListener("click", handleClick);
-  }, [gl, handleClick]);
+    const el = gl.domElement;
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointerup", onUp);
+    return () => {
+      el.removeEventListener("pointerdown", onDown);
+      el.removeEventListener("pointerup", onUp);
+    };
+  }, [camera, gl, scene, raycaster]);
 
   return null;
 };
@@ -228,7 +271,12 @@ const PlacementPreview = () => {
   if (mode !== "placing") return null;
 
   return (
-    <mesh ref={meshRef} visible={false} raycast={() => {}}>
+    <mesh
+      ref={meshRef}
+      visible={false}
+      raycast={() => {}}
+      userData={{ isPreview: true }}
+    >
       <sphereGeometry args={[radius, 32, 32]} />
       <meshStandardMaterial
         color={color}
@@ -242,9 +290,10 @@ const PlacementPreview = () => {
 
 export const Scene = () => {
   const controlsRef = useRef<OrbitControlsType | null>(null);
+  const mode = useStore((state) => state.mode);
 
   return (
-    <div className="scene">
+    <div className={`scene${mode === "placing" ? " scene--placing" : ""}`}>
       <Canvas
         camera={{ position: [7, 5.5, 9], fov: 45 }}
         gl={{
@@ -253,6 +302,10 @@ export const Scene = () => {
           toneMappingExposure: 1.1,
         }}
         shadows={{ type: THREE.PCFSoftShadowMap }}
+        onPointerMissed={() => {
+          const { mode, selectBall } = useStore.getState();
+          if (mode === "idle") selectBall(null);
+        }}
       >
         <color attach="background" args={[BG_COLOR]} />
         <fogExp2 attach="fog" args={[BG_COLOR, 0.032]} />
