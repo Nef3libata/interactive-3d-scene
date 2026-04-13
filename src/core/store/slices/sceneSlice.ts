@@ -3,6 +3,7 @@ import { Vector3 } from "three";
 import { type ViewPreset } from "../../models/types";
 
 const DEFAULT_CAMERA = new Vector3(7, 5.5, 9);
+const DEFAULT_ORBIT_CENTER = new Vector3(0, 0.8, 0);
 
 const VIEW_PRESET_POSITIONS: Record<ViewPreset, Vector3> = {
   top: new Vector3(0, 12, 0.01),
@@ -13,13 +14,20 @@ const VIEW_PRESET_POSITIONS: Record<ViewPreset, Vector3> = {
 
 export interface SceneSlice {
   cameraTarget: Vector3 | null;
+  orbitTarget: Vector3 | null;
   setCameraTarget: (target: Vector3 | null) => void;
+  setOrbitTarget: (target: Vector3 | null) => void;
   applyViewPreset: (preset: ViewPreset) => void;
 }
 
 export const createSceneSlice: StateCreator<SceneSlice> = (set) => ({
   cameraTarget: null,
+  orbitTarget: null,
   setCameraTarget: (target) => set({ cameraTarget: target }),
+  setOrbitTarget: (target) => set({ orbitTarget: target }),
   applyViewPreset: (preset) =>
-    set({ cameraTarget: VIEW_PRESET_POSITIONS[preset].clone() }),
+    set({
+      cameraTarget: VIEW_PRESET_POSITIONS[preset].clone(),
+      orbitTarget: DEFAULT_ORBIT_CENTER.clone(),
+    }),
 });
