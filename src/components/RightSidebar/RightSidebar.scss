@@ -266,6 +266,22 @@
   background: #4b93ff;
 }
 
+.right-sidebar__add-btn--active {
+  background: #1e3a5f;
+  box-shadow: 0 0 0 2px #3b82f6;
+  animation: pulse-ring 1.5s ease infinite;
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px #3b82f6;
+  }
+  50% {
+    box-shadow: 0 0 0 4px #3b82f680;
+  }
+}
+
 .right-sidebar__scene-objects {
   border-top: 1px solid v.$border;
   flex: 1;
