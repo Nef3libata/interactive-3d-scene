@@ -12,8 +12,8 @@ function App() {
         <div className="app__viewport">
           <Scene />
           <LeftSidebar />
+          <RightSidebar />
         </div>
-        <RightSidebar />
       </div>
     </div>
   );

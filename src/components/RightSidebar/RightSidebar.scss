@@ -1,13 +1,58 @@
 @use "../../assets/scss/variables" as v;
 
+.right-sidebar-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  transition: transform 0.25s ease;
+}
+
+.right-sidebar-wrapper--collapsed {
+  transform: translateX(280px);
+}
+
+.right-sidebar-toggle {
+  align-self: center;
+  width: 20px;
+  height: 40px;
+  margin-left: -20px;
+  background: #111827;
+  border-top: 1px solid #ffffff0f;
+  border-bottom: 1px solid #ffffff0f;
+  border-left: 1px solid #ffffff0f;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  color: #2d3a4a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.12s;
+
+  &:hover {
+    color: #cbd5e1;
+  }
+}
+
 .right-sidebar {
   width: 280px;
   background-color: #111827;
   border-left: 1px solid v.$border;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.right-sidebar__inner {
+  min-width: 280px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  overflow: auto;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #ffffff0f transparent;
 
