@@ -48,21 +48,17 @@ const StlModel = () => {
   );
 };
 
-const SceneSphere = ({ position, radius, color, visible }: Sphere) => {
-  if (!visible) return null;
-
-  return (
-    <mesh position={position} castShadow receiveShadow>
-      <sphereGeometry args={[radius, 40, 40]} />
-      <meshStandardMaterial
-        color={color}
-        metalness={0.15}
-        roughness={0.28}
-        envMapIntensity={1.2}
-      />
-    </mesh>
-  );
-};
+const SceneSphere = ({ position, radius, color }: Sphere) => (
+  <mesh position={position} castShadow receiveShadow>
+    <sphereGeometry args={[radius, 40, 40]} />
+    <meshStandardMaterial
+      color={color}
+      metalness={0.15}
+      roughness={0.28}
+      envMapIntensity={1.2}
+    />
+  </mesh>
+);
 
 const Spheres = () => {
   const spheres = useStore((state) => state.spheres);
@@ -93,26 +89,46 @@ const ShadowPlane = () => (
 
 const LERP_SPEED = 4;
 
+const SNAP_THRESHOLD = 0.08;
+
 const CameraController = ({
   controlsRef,
 }: {
   controlsRef: React.RefObject<OrbitControlsType | null>;
 }) => {
-  const cameraTarget = useStore((state) => state.cameraTarget);
-  const setCameraTarget = useStore((state) => state.setCameraTarget);
-
   useFrame(({ camera }, delta) => {
     cameraQuaternionRef.current.copy(camera.quaternion);
 
-    if (cameraTarget) {
-      camera.position.lerp(cameraTarget, LERP_SPEED * delta);
+    const { cameraTarget, orbitTarget, setCameraTarget, setOrbitTarget } =
+      useStore.getState();
 
-      if (camera.position.distanceTo(cameraTarget) < 0.05) {
-        camera.position.copy(cameraTarget);
-        setCameraTarget(null);
-      }
+    if (!cameraTarget && !orbitTarget) return;
 
-      controlsRef.current?.update();
+    const controls = controlsRef.current;
+    if (controls) controls.enableDamping = false;
+
+    const alpha = Math.min(LERP_SPEED * delta, 1);
+
+    if (cameraTarget) camera.position.lerp(cameraTarget, alpha);
+    if (orbitTarget && controls) controls.target.lerp(orbitTarget, alpha);
+
+    controls?.update();
+
+    const camDone =
+      !cameraTarget ||
+      camera.position.distanceTo(cameraTarget) < SNAP_THRESHOLD;
+    const orbitDone =
+      !orbitTarget ||
+      !controls ||
+      controls.target.distanceTo(orbitTarget) < SNAP_THRESHOLD;
+
+    if (camDone && orbitDone) {
+      if (cameraTarget) camera.position.copy(cameraTarget);
+      if (orbitTarget && controls) controls.target.copy(orbitTarget);
+      setCameraTarget(null);
+      setOrbitTarget(null);
+      if (controls) controls.enableDamping = true;
+      controls?.update();
     }
   });
 
@@ -182,9 +198,13 @@ export const Scene = () => {
           ref={controlsRef}
           makeDefault
           enableDamping
-          dampingFactor={0.07}
+          dampingFactor={0.12}
+          enablePan
+          panSpeed={1.2}
+          zoomSpeed={1.4}
+          rotateSpeed={0.8}
           target={[0, 0.8, 0]}
-          minDistance={2}
+          minDistance={1}
           maxDistance={40}
         />
       </Canvas>
