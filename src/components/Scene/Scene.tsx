@@ -358,10 +358,10 @@ export const Scene = () => {
           ref={controlsRef}
           makeDefault
           enableDamping
-          dampingFactor={0.12}
+          dampingFactor={0.08}
           enablePan
           panSpeed={1.2}
-          zoomSpeed={1.4}
+          zoomSpeed={0.7}
           rotateSpeed={0.8}
           target={[0, 0.8, 0]}
           minDistance={1}
