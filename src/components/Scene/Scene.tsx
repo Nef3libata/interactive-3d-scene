@@ -114,7 +114,7 @@ const ShadowPlane = () => (
 
 const LERP_SPEED = 4;
 
-const SNAP_THRESHOLD = 0.08;
+const SNAP_THRESHOLD = 0.002;
 
 const CameraController = ({
   controlsRef,
@@ -153,7 +153,6 @@ const CameraController = ({
       setCameraTarget(null);
       setOrbitTarget(null);
       if (controls) controls.enableDamping = true;
-      controls?.update();
     }
   });
 
