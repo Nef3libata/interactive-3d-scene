@@ -1,8 +1,13 @@
 .axes-indicator {
   position: absolute;
   bottom: 16px;
-  right: 16px;
+  right: 316px;
   z-index: 10;
+  transition: right 0.25s ease;
+
+  .scene--sidebar-collapsed & {
+    right: 36px;
+  }
   background: #0d1117cc;
   border: 1px solid #ffffff0f;
   backdrop-filter: blur(8px);

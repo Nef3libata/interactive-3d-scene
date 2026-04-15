@@ -291,9 +291,12 @@ const PlacementPreview = () => {
 export const Scene = () => {
   const controlsRef = useRef<OrbitControlsType | null>(null);
   const mode = useStore((state) => state.mode);
+  const sidebarCollapsed = useStore((state) => state.sidebarCollapsed);
 
   return (
-    <div className={`scene${mode === "placing" ? " scene--placing" : ""}`}>
+    <div
+      className={`scene${mode === "placing" ? " scene--placing" : ""}${sidebarCollapsed ? " scene--sidebar-collapsed" : ""}`}
+    >
       <Canvas
         camera={{ position: [7, 5.5, 9], fov: 45 }}
         gl={{

@@ -32,10 +32,11 @@ export const RightSidebar = () => {
   const startPlacing = useStore((state) => state.startPlacing);
   const selectedBallId = useStore((state) => state.selectedBallId);
   const selectBall = useStore((state) => state.selectBall);
+  const collapsed = useStore((state) => state.sidebarCollapsed);
+  const setCollapsed = useStore((state) => state.setSidebarCollapsed);
 
   const [selectedColor, setSelectedColor] = useState("#3b82f6");
   const [ballSize, setBallSize] = useState(4);
-  const [collapsed, setCollapsed] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddBall = () => {
@@ -77,7 +78,7 @@ export const RightSidebar = () => {
     >
       <button
         className="right-sidebar-toggle"
-        onClick={() => setCollapsed((prev) => !prev)}
+        onClick={() => setCollapsed(!collapsed)}
         aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
       >
         <svg
